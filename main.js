@@ -1,6 +1,8 @@
 const ctx = new AudioContext()
 // こういう謎のコンテキストとかをバンバン試していけるようなカッティングエッジな人間になりたい
 
+// この辺りの，いろんなコンテキストの書き方はまた使う時に便利になるので，少しずつ覚えていこう
+// 百人一首でも使うと思うのでね，覚えていきましょう概念レベルでね
 const sleep = (duration) => new Promise(r => setTimeout(r, duration))
 const gainNode = ctx.createGain()
 gainNode.gain.value = 0.1
