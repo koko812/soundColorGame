@@ -56,7 +56,8 @@ const playSolution = async () => {
 const playerInput = async (index) => {
     // ここもテクい，後ろにどんどん入っていく性質を使ってる
     const pos = playerInputList.length
-    if (solutionList[pos] == index) {
+    const solution = solutionList[pos]
+    if (solution == index) {
         isPlayerInput = false
         playerInputList.push(index)
         const { element, color, frequency } = buttonInfoList[index]
@@ -69,9 +70,26 @@ const playerInput = async (index) => {
         isPlayerInput = false
         startButtonContainer.innerHTML = `<span>level:${solutionList.length}</br>Game Over</span>`
         // beep の手前に await を入れると，再生中は他のが同時再生されない sleep がいらない（今更）
+        
         await beep(100, 100, 'sawtooth')
         await sleep(100)
         await beep(1000, 100, 'sawtooth')
+
+        // 参照は，キーの名前じゃないとできないということを忘れるミス（１敗）
+        const { element, color, frequency } = buttonInfoList[solution]
+        console.log(pos, solution, element);
+        element.style.backgroundColor = `hsl(${color}, 100%, 50%)`
+        await sleep(500)
+        element.style.backgroundColor = `hsl(${color}, 100%, 20%)`
+        await sleep(500)
+        element.style.backgroundColor = `hsl(${color}, 100%, 50%)`
+        await sleep(500)
+        element.style.backgroundColor = `hsl(${color}, 100%, 20%)`
+        await sleep(500)
+        element.style.backgroundColor = `hsl(${color}, 100%, 50%)`
+        await sleep(500)
+        element.style.backgroundColor = `hsl(${color}, 100%, 20%)`
+        await sleep(500)
     }
 
     if (solutionList.length === playerInputList.length) {
@@ -147,6 +165,14 @@ const init = () => {
             } else {
                 return
             }
+        }
+        element.onpointermove = (e) => {
+            if (isPlayerInput) {
+                element.style.backgroundColor = `hsl(${color}, 100%, 40%)`
+            }
+        }
+        element.onpointerleave = (e) => {
+            element.style.backgroundColor = `hsl(${color}, 100%, 20%)`
         }
     }
 
