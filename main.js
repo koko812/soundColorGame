@@ -38,6 +38,7 @@ const playerInputList = []
 const playSolution = async () => {
     console.log(solutionList);
     isPlayerInput = false
+    startButtonContainer.innerHTML = `<span>level:${solutionList.length}</span>`
     for (const solution of solutionList) {
         const { element, color, frequency } = buttonInfoList[solution]
         beep(playDuration, frequency)
@@ -59,24 +60,30 @@ const playerInput = async (index) => {
         isPlayerInput = false
         playerInputList.push(index)
         const { element, color, frequency } = buttonInfoList[index]
-        beep(playDuration, frequency)
         element.style.backgroundColor = `hsl(${color}, 100%, 50%)`
-        await sleep(playDuration)
+        await beep(playDuration, frequency)
         element.style.backgroundColor = `hsl(${color}, 100%, 20%)`
     } else {
         //gameover
         // ライフせいにするのはいいかもしれない（思った以上にむずかった）
+        isPlayerInput = false
+        startButtonContainer.innerHTML = `<span>level:${solutionList.length}</br>Game Over</span>`
+        // beep の手前に await を入れると，再生中は他のが同時再生されない sleep がいらない（今更）
+        await beep(100, 100, 'sawtooth')
+        await sleep(100)
+        await beep(1000, 100, 'sawtooth')
     }
 
     if (solutionList.length === playerInputList.length) {
         nextStage()
     } else {
         isPlayerInput = true
-        // ここで playerInput を呼び出さないの，テクくていいね
-        // あくまでずっと入力は受け付けてますよスタイル
+        // ここで playerInput 関数を呼び出さないの，テクくていいね
+        // あくまでずっと入力は受け付けてますよスタイル, gameover の可否は入力可能かのみで管理
     }
 }
 
+let rotate = 0;
 const nextStage = async () => {
     const lastSolution = solutionList[solutionList.length - 1]
     while (true) {
@@ -86,18 +93,30 @@ const nextStage = async () => {
             break
         }
     }
-    await sleep(300)
+
+    drRange = 30 * (1.3 ** solutionList.length)
+    console.log(1.3 ** solutionList.length, drRange);
+    dr = drRange * (Math.random() * 2 - 1)
+    rotate += dr
+    rotateDuration = Math.max(300, Math.abs(Math.trunc(300 * (dr / 30))))
+    container.style.transition = `all ${rotateDuration}ms linear`
+    container.style.transform = `rotate(${rotate}deg)`
+    await sleep(rotateDuration + 300)
     playSolution()
 }
 
+let startButtonContainer;
+let container;
 
 const init = () => {
-    const container = document.createElement('div')
+    container = document.createElement('div')
     document.body.appendChild(container)
     container.style.position = `absolute`
     container.style.width = `${size}px`
     container.style.height = `${size}px`
     //container.style.border = '1px solid'
+    container.style.transform = 'rotate(0)'
+    container.style.transition = 'all 300ms linear'
 
     for (let i = 0; i < buttonNum; i++) {
         const element = document.createElement('div')
@@ -133,7 +152,7 @@ const init = () => {
 
     // ここで，スタートボタンのコンテナまでも用意する必要はあるんだろうか，と思った
     // タッチ判定とかそういう話？でも別にコンテナを分ける必要はなないと思うけど
-    const startButtonContainer = document.createElement('div')
+    startButtonContainer = document.createElement('div')
     document.body.appendChild(startButtonContainer)
     startButtonContainer.style.position = `absolute`
     startButtonContainer.style.width = `${size}px`
@@ -141,6 +160,7 @@ const init = () => {
     startButtonContainer.style.display = `flex`
     startButtonContainer.style.justifyContent = `center`
     startButtonContainer.style.alignItems = `center`
+    startButtonContainer.style.textAlign = 'center'
     // 勝手に真ん中寄せできるのはまあ楽と言えば楽か・・・？
 
     const startButton = document.createElement('div')
