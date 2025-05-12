@@ -70,7 +70,7 @@ const playerInput = async (index) => {
         isPlayerInput = false
         startButtonContainer.innerHTML = `<span>level:${solutionList.length}</br>Game Over</span>`
         // beep の手前に await を入れると，再生中は他のが同時再生されない sleep がいらない（今更）
-        
+
         await beep(100, 100, 'sawtooth')
         await sleep(100)
         await beep(1000, 100, 'sawtooth')
@@ -214,7 +214,6 @@ const init = () => {
         //gameStart() // gameStart より，startGame の方が，ゲームを開始するための処理ってのが伝わりやすい
         startGame()
     }
-
 }
 
 window.onload = () => {
