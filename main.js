@@ -76,6 +76,7 @@ const playerInput = async (index) => {
         await beep(1000, 100, 'sawtooth')
 
         // 参照は，キーの名前じゃないとできないということを忘れるミス（１敗）
+        // この辺り，gameOver() 関数にまとめてしまった方がいいような気がする（データの受け渡しに苦手意識があるため，サクッと実装できない）
         const { element, color, frequency } = buttonInfoList[solution]
         console.log(pos, solution, element);
         element.style.backgroundColor = `hsl(${color}, 100%, 50%)`
@@ -112,6 +113,7 @@ const nextStage = async () => {
         }
     }
 
+    // ここ，回転する度数をステージごとに増やして行きたかったんだが，適切な関数がパッと思い浮かばなかった
     drRange = 30 * (1.3 ** solutionList.length)
     console.log(1.3 ** solutionList.length, drRange);
     dr = drRange * (Math.random() * 2 - 1)
