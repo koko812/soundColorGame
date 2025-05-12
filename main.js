@@ -80,6 +80,8 @@ const playerInput = async (index) => {
         // この辺り，gameOver() 関数にまとめてしまった方がいいような気がする（データの受け渡しに苦手意識があるため，サクッと実装できない）
         const { element, color, frequency } = buttonInfoList[solution]
         console.log(pos, solution, element);
+        // だいたい，この辺り，% とかをベタガキしてるのが本当によくない，隠蔽するべき，当たり前
+        // codeReview は重要だな
         element.style.backgroundColor = `hsl(${color}, 100%, 50%)`
         await sleep(500)
         element.style.backgroundColor = `hsl(${color}, 100%, 20%)`
