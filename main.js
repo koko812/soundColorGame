@@ -18,6 +18,7 @@ const beep = async (duration, frequency, wave = 'square') => {
 }
 
 const size = 300
+// 10 round したらクリアで，円環が回って収束したのち，弾け飛んでいくような演出をつけたい
 const roundNum = 5
 const buttonNum = 8
 const buttonInfoList = []
