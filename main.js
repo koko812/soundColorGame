@@ -26,31 +26,70 @@ const solutionList = []
 const startGame = () => {
     let lastSolution = null
     let solution = null
-    for (let i = 0; i < roundNum; i++) {
-        solution = Math.trunc(Math.random() * buttonNum)
-        solutionList.push(solution)
-        /*
-        do {
-            solution = Math.trunc(Math.random() * buttonNum)
-        } while (solution === lastSolution)
-        solutionList.push(solution)
-        lastSolution = solution
-        */
-    }
+    solution = Math.trunc(Math.random() * buttonNum)
+    solutionList.push(solution)
     playSolution()
 }
 
-let playDuration = 200
+let playDuration = 300
+let isPlayerInput = true
+const playerInputList = []
+
 const playSolution = async () => {
     console.log(solutionList);
+    isPlayerInput = false
     for (const solution of solutionList) {
         const { element, color, frequency } = buttonInfoList[solution]
         beep(playDuration, frequency)
         element.style.backgroundColor = `hsl(${color}, 100%, 50%)`
+        // ここの sleep の duration も変えると，リズムゲームに近づくかもね
+        // 普通にリズムゲームも作ってみたくなってきた
         await sleep(playDuration)
         element.style.backgroundColor = `hsl(${color}, 100%, 20%)`
     }
+    isPlayerInput = true
+    // いつも思うけど，この配列のリセット方法はテクいよね
+    playerInputList.length = 0
 }
+
+const playerInput = async (index) => {
+    // ここもテクい，後ろにどんどん入っていく性質を使ってる
+    const pos = playerInputList.length
+    if (solutionList[pos] == index) {
+        isPlayerInput = false
+        playerInputList.push(index)
+        const { element, color, frequency } = buttonInfoList[index]
+        beep(playDuration, frequency)
+        element.style.backgroundColor = `hsl(${color}, 100%, 50%)`
+        await sleep(playDuration)
+        element.style.backgroundColor = `hsl(${color}, 100%, 20%)`
+    } else {
+        //gameover
+        // ライフせいにするのはいいかもしれない（思った以上にむずかった）
+    }
+
+    if (solutionList.length === playerInputList.length) {
+        nextStage()
+    } else {
+        isPlayerInput = true
+        // ここで playerInput を呼び出さないの，テクくていいね
+        // あくまでずっと入力は受け付けてますよスタイル
+    }
+}
+
+const nextStage = async () => {
+    const lastSolution = solutionList[solutionList.length - 1]
+    while (true) {
+        const solution = Math.trunc(Math.random() * buttonNum)
+        if (solution !== lastSolution) {
+            solutionList.push(solution)
+            break
+        }
+    }
+    await sleep(300)
+    playSolution()
+}
+
 
 const init = () => {
     const container = document.createElement('div')
@@ -83,6 +122,13 @@ const init = () => {
         const frequency = 440 * (2 ** (i / buttonNum))
         buttonInfoList.push({ element, color, frequency })
         // いい感じの円環ができた，これが回ると考えるとちょっとワクワクしちゃうね
+        element.onpointerdown = (e) => {
+            if (isPlayerInput) {
+                playerInput(i)
+            } else {
+                return
+            }
+        }
     }
 
     // ここで，スタートボタンのコンテナまでも用意する必要はあるんだろうか，と思った
